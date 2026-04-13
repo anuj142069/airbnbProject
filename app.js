@@ -88,15 +88,38 @@ app.use("/host", (req, res, next) => {
 });
 app.use("/host", hostRouter);
 
+let isConnectedToMongo = false;
+
+async function connectToMongo() {
+  try {
+    await mongoose.connect(process.env.DB_PATH, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }); 
+    isConnectedToMongo = true;
+    console.log('Connected to Mongo');
+  }catch (err) {
+    console.error('Error while connecting to Mongo: ', err);
+  }
+}
+
+app.use((req, res, next) => {
+  if (!isConnectedToMongo) {
+    connectToMongo();
+  }
+    next(); 
+})
+
+
 app.use(errorsController.pageNotFound);
 
-const PORT = 3003;
+// const PORT = 3003;
 
 mongoose.connect(DB_PATH).then(() => {
   console.log('Connected to Mongo');
-  app.listen(PORT, () => {
-    console.log(`Server running on address http://localhost:${PORT}`);
-  });
+  // app.listen(PORT, () => {
+  //   console.log(`Server running on address http://localhost:${PORT}`);
+  // });
 }).catch(err => {
   console.log('Error while connecting to Mongo: ', err);
 });

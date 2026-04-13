@@ -113,6 +113,8 @@ app.use((req, res, next) => {
 
 app.use(errorsController.pageNotFound);
 
+module.exports = app;
+
 // const PORT = 3003;
 
 mongoose.connect(DB_PATH).then(() => {
